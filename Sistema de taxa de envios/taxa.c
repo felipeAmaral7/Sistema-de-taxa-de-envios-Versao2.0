@@ -16,7 +16,7 @@ int clienteOuAdm(){
         scanf("%d", &tipoDeCliente);
         limparBufferTeclado();
 		if(tipoDeCliente < 0 || tipoDeCliente > 1){
-			printf("Digite uma entrada válida\n");
+			printf("Digite uma entrada valida\n");
 		}
     }while(tipoDeCliente < 0 || tipoDeCliente > 1);
 	limparTela();
@@ -47,6 +47,7 @@ void chamaAdm(Fila *fila, Pilha *pilha1, Pilha *pilha2){
 	int cont = 3;
 
 	while(scanf("%d", &tenta3X), tenta3X != 12345  && cont != 0){
+		limparBufferTeclado();
 		printf("Senha incorreta, voce tem mais %d chances\n", cont);
 		cont--;
 	}
@@ -165,7 +166,7 @@ void chamaCliente(Fila *fila, Pilha *pilha1){
 			int j;
 			for(j = 0; j < quantPessoas; j++){
 				printf("Digite o nome do %d ° que ira enviar: ", j+1);
-				person[j] = lerPessoas();
+				lerPessoas(&person[j]);
 				printf("\n\n");
 			}
 			entra1x = 0;
@@ -186,6 +187,7 @@ void chamaCliente(Fila *fila, Pilha *pilha1){
 			printf("\nDigite o tipo do produto: \n");
 			do{
 				scanf("%d", &person[i].tipoProduto);
+				limparBufferTeclado();
 				
 				if(person[i].tipoProduto < 0 || person[i].tipoProduto > 3){
 					printf("Digite um valor valido:\n");
@@ -203,6 +205,8 @@ void chamaCliente(Fila *fila, Pilha *pilha1){
 			printf("\nAgora digite o tipo de destino:\n");
 			do{
 				scanf("%d", &person[i].destino);
+				limparBufferTeclado();
+
 				if(person[i].destino < 0 || person[i].destino > 3){
 					printf("Digite um valor valido:\n");
 				}
@@ -214,6 +218,8 @@ void chamaCliente(Fila *fila, Pilha *pilha1){
 
 			do{
 				scanf("%lf", &person[i].peso);
+				limparBufferTeclado();
+
 				if(person[i].peso <= 0){
 					printf("Digite um valor positivo\n");
 				}
@@ -225,8 +231,8 @@ void chamaCliente(Fila *fila, Pilha *pilha1){
 			if(entraEmbalagem1x){
 				printf("\nVoce deseja que seu produto seja embrulhado? Digite 's' para sim ou 'n' para nao: ");
 				do{	
-					limparBufferTeclado();
 					scanf("%c", &embrulhadoOuNao);
+					limparBufferTeclado();
 					
 					if(embrulhadoOuNao != 's' && embrulhadoOuNao != 'n'){
 						printf("\nDigite uma entrada valida: ");
@@ -234,7 +240,6 @@ void chamaCliente(Fila *fila, Pilha *pilha1){
 				}while(embrulhadoOuNao != 's' && embrulhadoOuNao != 'n');
 				entraEmbalagem1x = 0;
 			}
-			limparBufferTeclado();
 			limparTela();
 
 			if(embrulhadoOuNao == 's'){
@@ -244,25 +249,14 @@ void chamaCliente(Fila *fila, Pilha *pilha1){
 			else{
 				person[i].embrulhado = 0;
 			}
-			
-			if(person[i].tipoProduto >= 0 && person[i].tipoProduto <=3 && person[i].destino >= 0 && person[i].destino <=3){
-				
-				double taxa1, taxa2;
-				
-				taxa1 = taxaPeso(person[i].peso);		//aplica a devida taxa sob o peso
-				
-				taxa2 = taxaDistancia(person[i].tipoProduto, person[i].destino);		//procura a devida taxa na matriz;
-				
-				person[i].taxa[cont] = (taxa1 + taxa2);		//acumula a taxa da pessoa i na posicao cont, até n taxas
-				
-				cont ++;
-			}
-			else{
-				printf("\nValores invalidos");
-			}
+
+
+			aplicaTaxa(&person[i], cont);												//acumula a taxa da pessoa i na posicao cont, até n taxas		
+			cont ++;
 
 			printf("\nDeseja enviar novamente? Se sim, digite 's', caso nao 'n'");
 			scanf("%c", &repit);
+			limparBufferTeclado();
 			limparTela();
 		}
 		person[i].quantProdutos = cont;		//quantidade de produtos que a pessoa enviou
@@ -271,12 +265,22 @@ void chamaCliente(Fila *fila, Pilha *pilha1){
 		for(j = 0; j < person[i].quantProdutos; j++){
 			person[i].taxaFinal += person[i].taxa[j];		//acumula a taxa total da pessoa
 		}
-		inserirNaFila(fila, person[i]);		//insere na fila a pessoa em questao
+		inserirNaFila(fila, &person[i]);		//insere na fila a pessoa em questao
 	}
 
 	printc('-', 100);
 	imprimirFila(fila);
 	printc('-', 100);
+}
+
+int aplicaTaxa(Pessoa *pessoa, int pos){
+			
+	double taxa1, taxa2;
+	taxa1 = taxaPeso(pessoa->peso);									//aplica a devida taxa sob o peso
+
+	taxa2 = taxaDistancia(pessoa->tipoProduto, pessoa->destino);		//procura a devida taxa na matriz;
+
+	pessoa->taxa[pos] = (taxa1 + taxa2);
 }
 
 void printc(char c, int tamanho){
@@ -331,20 +335,19 @@ double taxaDistancia(int tipoProduto, int distancia){
 	return matriz[tipoProduto][distancia];
 }
 
-Pessoa lerPessoas(){
-	Pessoa person;
+void lerPessoas(Pessoa *pessoa){
 
-	scanf("%s", person.nome);
+	scanf("%s", pessoa->nome);
 	limparBufferTeclado();
 
 	printf("Digite sua idade: ");
-	scanf("%d", &person.idade);
-
-	printf("Digite seu cpf: ");
-	scanf("%d", &person.cpf);
+	scanf("%d", &pessoa->idade);
 	limparBufferTeclado();
 
-	return person;
+	printf("Digite seu cpf: ");
+	scanf("%d", &pessoa->cpf);
+	limparBufferTeclado();
+
 }
 
 Fila* criarFila(){
@@ -354,10 +357,10 @@ Fila* criarFila(){
 	return fila;
 }
 
-void inserirNaFila(Fila *fila, Pessoa person){
+void inserirNaFila(Fila *fila, Pessoa *person){
 	No *novo = malloc(sizeof(No));
 	if(novo){
-		novo->pessoa = person;
+		novo->pessoa = *person;
 		novo->prox = NULL;
 		if(fila->prim == NULL){
 			fila->prim = novo;
