@@ -24,4 +24,6 @@ int main(void){
 		limparTela();
 	}while(continuaOrNo == 's');
 	printf("OBRIGADO POR UTILIZAR O NOSSO SISTEMA :)\n");
+	getchar();
+	getchar();
 }
