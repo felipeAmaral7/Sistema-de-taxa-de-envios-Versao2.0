@@ -68,6 +68,8 @@ void verClientesEmbalados(Fila *fila, Pilha *pilha2);
 //funcao que chama o cliente que chama outras funcoes
 void chamaCliente(Fila *fila, Pilha *pilha1);
 
+int aplicaTaxa(Pessoa *pessoa, int pos);
+
 //limpa buffer do teclado
 void limparBufferTeclado();
 
@@ -88,13 +90,13 @@ double taxaPeso(double peso);
 double taxaDistancia(int tipoProduto, int distancia);
 
 //ler as pessoas
-Pessoa lerPessoas();
+void lerPessoas(Pessoa *pessoa);
 
 //cria uma fila
 Fila* criarFila();
 
 //insere uma pessoa na fila
-void inserirNaFila(Fila *fila, Pessoa pessoa);
+void inserirNaFila(Fila *fila, Pessoa *pessoa);
 
 //remove e retorna o elemento removido da fila
 No* removerDaFila(Fila *fila);
